@@ -2,6 +2,9 @@ package com.example.musicholes.ui.home;
 
 import android.Manifest;
 import android.content.Intent;
+import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
+import android.media.MediaMetadataRetriever;
 import android.os.Bundle;
 import android.os.Environment;
 import android.view.LayoutInflater;
@@ -35,7 +38,8 @@ public class HomeFragment extends Fragment {
     private SearchView searchView;
     private ArrayList<File> mySongs;
     private ArrayList<String> songPaths;
-    private ArrayAdapter<String> adapter;
+    private SongAdapter adapter;
+    private ArrayAdapter<String> adapter1;
 
     public View onCreateView(@NonNull LayoutInflater inflater,
                              ViewGroup container, Bundle savedInstanceState) {
@@ -53,12 +57,13 @@ public class HomeFragment extends Fragment {
                         Toast.makeText(requireActivity(), "Permission Granted!", Toast.LENGTH_SHORT).show();
                         mySongs = fetchSongs(Environment.getExternalStorageDirectory());
                         songPaths = new ArrayList<>();
+                        adapter = new SongAdapter(requireActivity(), mySongs);
                         String[] items = new String[mySongs.size()];
                         for (int i = 0; i < mySongs.size(); i++) {
                             items[i] = mySongs.get(i).getName().replace(".mp3", "");
                             songPaths.add(mySongs.get(i).getAbsolutePath()); // Collect file paths
                         }
-                        adapter = new ArrayAdapter<>(requireActivity(), android.R.layout.simple_list_item_1, items);
+                        adapter1 = new ArrayAdapter<>(requireActivity(), android.R.layout.simple_list_item_1, items);
                         listView.setAdapter(adapter);
 
                         listView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
@@ -66,7 +71,7 @@ public class HomeFragment extends Fragment {
                             public void onItemClick(AdapterView<?> adapterView, View view, int position, long id) {
                                 Intent intent = new Intent(requireActivity(), PlaySong.class);
                                 String currentSong = listView.getItemAtPosition(position).toString();
-                                intent.putStringArrayListExtra("songList", songPaths); // Pass paths
+                                intent.putStringArrayListExtra("songList", songPaths);
                                 intent.putExtra("Position", position);
                                 startActivity(intent);
                             }
